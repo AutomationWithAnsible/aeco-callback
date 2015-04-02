@@ -42,7 +42,7 @@ class ElasticCallBack():
         if self.db_status:
             try:
                 result = self.helpers.helpers.bulk(self.es, data, index=self.index_name, doc_type=doc_type)
-                logging.debug("Inserting  into ES result='%s' doc_type='%s' index='%s data='%s'" %
+                logging.debug("Inserting into ES result='%s' doc_type='%s' index='%s data='%s'" %
                               (result, doc_type, self.index_name, data))
                 if result:
                     return True

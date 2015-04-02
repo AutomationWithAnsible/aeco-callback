@@ -92,23 +92,27 @@ class TaskFile():
         return False
 
     @classmethod
-    def write_failures_to_file(cls, host, res, ignore_errors):
+    def write_failures_to_file(cls, host, res, ignore_errors, name=None):
         failure_data = dict()
         invocation = res.get("invocation", {})
         failure_data["fail_module_args"] = invocation.get("module_args", "")
         failure_data["fail_module_name"] = invocation.get("module_name", "")
         failure_data["ignore_error"] = ignore_errors
+        if name:
+            failure_data["task_name"] = name
         failure_data["host"] = host
         failure_data["fail_msg"] = res.get("msg", "")
         cls._write_to_file(cls.file_failure, failure_data)
 
     @classmethod
-    def write_changed_to_file(cls, host, res):
+    def write_changed_to_file(cls, host, res, name=None):
         changed_data = dict()
         invocation = res.get("invocation", {})
         changed_data["changed_module_args"] = invocation.get("module_args", "")
         changed_data["changed_module_name"] = invocation.get("module_name", "")
         changed_data["host"] = host
+        if name:
+            changed_data["task_name"] = name
         changed_data["changed_msg"] = res.get("msg", "")
         cls._write_to_file(cls.file_changed, changed_data)
 
@@ -166,6 +170,8 @@ class AecoCallBack(object):
                 changed["changed_msg"] = json_line.get("changed_msg")
                 changed["changed_module_name"] = json_line.get("changed_module_name")
                 changed["changed_module_args"] = json_line.get("changed_module_args")
+                if json_line.get("task_name", False):
+                    changed["task_name"] = json_line.get("task_name")
                 changed.update(self.common)
                 self.changed.append(changed)
 
@@ -184,6 +190,9 @@ class AecoCallBack(object):
                 failure["fail_module_name"] = json_line.get("fail_module_name")
                 failure["ignore_error"] = json_line.get("ignore_error")
                 failure["fail_module_args"] = json_line.get("fail_module_args")
+                if json_line.get("task_name", False):
+                    failure["task_name"] = json_line.get("task_name")
+
                 failure.update(self.common)
                 self.failures.append(failure)
 

@@ -27,24 +27,24 @@ for key, value in conf_dic.iteritems():
 
 class CallbackModule(object):
     def __init__(self):
+        self.current_task = None
         if len(db_settings) > 1:
             self.my_aeco = AecoCallBack()
             self.my_aeco.db_settings = db_settings
             self.enabled = True
         else:
             self.enabled = False
-            pass
 
     def on_any(self, *args, **kwargs):
         pass
 
     def runner_on_failed(self, host, res, ignore_errors=False):
         if self.enabled:
-            TaskFile().write_failures_to_file(host, res, ignore_errors)
+            TaskFile().write_failures_to_file(host, res, ignore_errors, self.current_task)
 
     def runner_on_ok(self, host, res):
         if self.enabled and res.get("changed"):
-            TaskFile().write_changed_to_file(host, res)
+            TaskFile().write_changed_to_file(host, res, self.current_task)
 
     def runner_on_skipped(self, host, item=None):
         pass
@@ -78,7 +78,7 @@ class CallbackModule(object):
         pass
 
     def playbook_on_task_start(self, name, is_conditional):
-        pass
+        self.current_task = name
 
     def playbook_on_vars_prompt(self, varname, private=True, prompt=None, encrypt=None, confirm=False, salt_size=None, salt=None, default=None):
         pass
